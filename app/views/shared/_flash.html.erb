@@ -1,0 +1,16 @@
+<%# Renders flash and (optionally) locals: notice/alert %>
+<%# Accepts both flash[] and locals so controller can pass either %>
+<% msgs = [] %>
+<% msgs << notice if defined?(notice) && notice.present? %>
+<% msgs << alert  if defined?(alert)  && alert.present? %>
+<% flash.each { |_, msg| msgs << msg } %>
+
+<% if msgs.any? %>
+  <div class="space-y-2">
+    <% msgs.each do |msg| %>
+      <div class="rounded-md border px-3 py-2 bg-emerald-50 border-emerald-200 text-emerald-800">
+        <%= msg %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

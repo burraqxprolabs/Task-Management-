@@ -17,12 +17,29 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%# Tailwind build outputs app/assets/builds/application.css via package.json script %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="bg-gray-100 font-sans leading-normal tracking-normal">
-    <%= yield %>
+  <body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen">
+    <header class="bg-white border-b">
+      <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <a href="/" class="text-xl font-semibold text-gray-900">Task Manager</a>
+        </div>
+        <div class="flex items-center gap-4">
+          <%= link_to "Tasks", tasks_path, class: "text-gray-600 hover:text-gray-900" %>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+      <%= turbo_frame_tag "flash" do %>
+        <%= render "shared/flash" %>
+      <% end %>
+
+      <%= yield %>
+    </main>
   </body>
 </html>

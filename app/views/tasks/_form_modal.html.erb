@@ -1,0 +1,9 @@
+<!-- app/views/tasks/_form_modal.html.erb -->
+<%= turbo_frame_tag "task_modal" do %>
+  <div class="modal-backdrop">
+    <div class="modal">
+      <h2 class="mb-2"><%= task.new_record? ? "New Task" : "Edit Task" %></h2>
+      <%= render "tasks/form", task: task %>
+    </div>
+  </div>
+<% end %>

@@ -1,63 +1,94 @@
+# app/controllers/tasks_controller.rb
 class TasksController < ApplicationController
-  before_action :set_task, only: %i[show edit update destroy]
+  include ActionView::RecordIdentifier
+  before_action :set_task, only: [:show, :edit, :update, :destroy]
 
   def index
-    @tasks = Task.all
-    @tasks = @tasks.query(params[:q])
-                     .with_status(params[:status])
-                     .with_priority(params[:priority])
-                     .due_after(params[:due_after])
-                     .due_before(params[:due_before])
+    @tasks = Task.order(created_at: :desc)
   end
-
-  def show; end
 
   def new
     @task = Task.new
+    if turbo_frame_request?
+      render partial: "tasks/form_modal", locals: { task: @task }, layout: false
+    else
+      render :new
+    end
   end
 
   def create
     @task = Task.new(task_params)
+
     respond_to do |format|
       if @task.save
-        format.html { redirect_to @task, notice: 'Task was successfully created.' }
-        format.turbo_stream { head :ok }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.prepend("tasks", partial: "tasks/task", locals: { task: @task }),
+            turbo_stream.update("task_modal", "")
+          ]
+        end
+        format.html { redirect_to tasks_path, notice: "Task created.", status: :see_other }
       else
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "task_modal",
+            partial: "tasks/form_modal",
+            locals: { task: @task }
+          )
+        end
         format.html { render :new, status: :unprocessable_entity }
-        format.turbo_stream { render :new, status: :unprocessable_entity }
       end
     end
   end
 
-  def edit; end
+  def edit
+    if turbo_frame_request?
+      render partial: "tasks/form_modal", locals: { task: @task }, layout: false
+    else
+      render :edit
+    end
+  end
 
   def update
     respond_to do |format|
       if @task.update(task_params)
-        format.html { redirect_to @task, notice: 'Task was successfully updated.' }
-        format.turbo_stream { head :ok }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@task), partial: "tasks/task", locals: { task: @task }),
+            turbo_stream.update("task_modal", "")
+          ]
+        end
+        format.html { redirect_to tasks_path, notice: "Task updated.", status: :see_other }
       else
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "task_modal",
+            partial: "tasks/form_modal",
+            locals: { task: @task }
+          )
+        end
         format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream { render :edit, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def show
+    if turbo_frame_request?
+      render partial: "tasks/task", locals: { task: @task }, layout: false
+    else
+      # render full page if you have one
     end
   end
 
   def destroy
     @task.destroy
     respond_to do |format|
-      format.html { redirect_to tasks_url, notice: 'Task was successfully destroyed.' }
-      format.turbo_stream { head :ok }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(dom_id(@task)) }
+      format.html { redirect_to tasks_path, notice: "Task deleted.", status: :see_other }
     end
   end
 
   private
-
-  def set_task
-    @task = Task.find(params[:id])
-  end
-
-  def task_params
-    params.require(:task).permit(:title, :description, :status, :due_date, :priority)
-  end
+  def set_task; @task = Task.find(params[:id]); end
+  def task_params; params.require(:task).permit(:title, :description, :status, :due_date, :priority); end
 end

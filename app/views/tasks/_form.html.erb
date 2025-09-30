@@ -1,0 +1,42 @@
+<!-- app/views/tasks/_form.html.erb -->
+<%= form_with(model: task, data: { turbo: true }, class: "space-y-3") do |f| %>
+  <% if task.errors.any? %>
+    <div class="border border-red-300 bg-red-50 p-2 rounded">
+      <ul class="list-disc ml-5">
+        <% task.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title, required: true, class: "w-full" %>
+  </div>
+
+  <div>
+    <%= f.label :description %>
+    <%= f.text_area :description, rows: 3, class: "w-full" %>
+  </div>
+
+  <div class="flex gap-3">
+    <div>
+      <%= f.label :status %>
+      <%= f.select :status, [["Todo","todo"],["Doing","doing"],["Done","done"]], {}, class: "w-full" %>
+    </div>
+    <div>
+      <%= f.label :priority %>
+      <%= f.number_field :priority, class: "w-24" %>
+    </div>
+    <div>
+      <%= f.label :due_date %>
+      <%= f.datetime_local_field :due_date, class: "w-full" %>
+    </div>
+  </div>
+
+  <div class="mt-2 flex gap-2">
+    <%= f.submit class: "btn" %>
+    <%= link_to "Cancel", "#", data: { action: "click->modal#close" }, class: "btn-secondary" %>
+  </div>
+<% end %>
