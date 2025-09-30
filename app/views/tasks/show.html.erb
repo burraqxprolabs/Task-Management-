@@ -1,0 +1,12 @@
+<%= turbo_frame_tag dom_id(@task) do %>
+  <div class="task-details">
+    <h2><%= @task.title %></h2>
+    <p><strong>Description:</strong> <%= @task.description %></p>
+    <p><strong>Status:</strong> <%= @task.status %></p>
+    <p><strong>Due Date:</strong> <%= @task.due_date.strftime('%B %d, %Y') %></p>
+    <p><strong>Priority:</strong> <%= @task.priority %></p>
+
+    <%= link_to 'Edit', edit_task_path(@task), class: 'btn btn-primary' %> |
+    <%= link_to 'Back to Tasks', tasks_path, class: 'btn btn-secondary' %>
+  </div>
+<% end %>

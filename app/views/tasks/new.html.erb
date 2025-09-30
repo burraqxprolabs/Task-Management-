@@ -1,0 +1,41 @@
+<%= turbo_frame_tag "tasks" do %>
+  <%= form_with(model: @task, local: false) do |form| %>
+    <% if @task.errors.any? %>
+      <div class="errors">
+        <h2>Errors</h2>
+        <ul>
+          <% @task.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :title %>
+      <%= form.text_field :title %>
+    </div>
+
+    <div>
+      <%= form.label :description %>
+      <%= form.text_area :description %>
+    </div>
+
+    <div>
+      <%= form.label :status %>
+      <%= form.text_field :status %>
+    </div>
+
+    <div>
+      <%= form.label :due_date %>
+      <%= form.datetime_local_field :due_date %>
+    </div>
+
+    <div>
+      <%= form.label :priority %>
+      <%= form.number_field :priority %>
+    </div>
+
+    <%= form.submit "Create Task" %>
+  <% end %>
+<% end %>

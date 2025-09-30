@@ -1,0 +1,24 @@
+<%= turbo_frame_tag dom_id(task) do %>
+  <div class="task-card rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+    <h3 class="text-lg font-semibold text-gray-900 mb-2"><%= task.title %></h3>
+
+    <p class="text-sm text-gray-600 mb-3"><%= task.description %></p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+      <p class="text-gray-500">Status
+        <span class="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800"><%= task.status %></span>
+      </p>
+      <p class="text-gray-500">Due Date
+        <span class="ml-2 text-gray-700"><%= task.due_date&.strftime('%B %d, %Y') || '—' %></span>
+      </p>
+      <p class="text-gray-500">Priority
+        <span class="ml-2 text-gray-700"><%= task.priority %></span>
+      </p>
+    </div>
+
+    <div class="mt-4 flex items-center gap-3">
+      <%= link_to 'Edit', edit_task_path(task), data: { turbo_frame: dom_id(task) }, class: 'inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2' %>
+      <%= button_to 'Destroy', task, method: :delete, data: { turbo_confirm: 'Are you sure?' }, class: 'inline-flex items-center rounded-md bg-rose-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2' %>
+    </div>
+  </div>
+<% end %>

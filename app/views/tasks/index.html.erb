@@ -1,0 +1,41 @@
+<%= turbo_stream_from "tasks" %>
+
+<div class="mb-6">
+  <%= form_with url: tasks_path, method: :get, local: false, data: { turbo_frame: "tasks" }, class: "grid grid-cols-1 sm:grid-cols-6 gap-3" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :q, value: params[:q], placeholder: "Title or description…", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div>
+      <%= f.label :status, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :status, value: params[:status], placeholder: "e.g. open/closed", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div>
+      <%= f.label :priority, class: "block text-sm font-medium text-gray-700" %>
+      <%= f.number_field :priority, value: params[:priority], class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div>
+      <%= f.label :due_after, "Due After", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :due_after, value: params[:due_after], class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div>
+      <%= f.label :due_before, "Due Before", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :due_before, value: params[:due_before], class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+    </div>
+    <div class="flex items-end">
+      <%= f.submit "Filter", class: "inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+    </div>
+  <% end %>
+</div>
+
+<%= turbo_frame_tag "tasks", class: "block" do %>
+  <div id="tasks_list" class="task-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @tasks.each do |task| %>
+      <%= render partial: "task", locals: { task: task } %>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="mt-6">
+  <%= link_to 'New Task', new_task_path, data: { turbo_frame: "tasks" }, class: "inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+</div>
