@@ -11,6 +11,14 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  resources :tasks
+  resources :tasks do
+    member do
+      get :modal
+    end
+    collection do
+      get :calendar
+      get :events
+    end
+  end
   root "tasks#index" 
 end

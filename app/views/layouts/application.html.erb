@@ -17,6 +17,8 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <%# Tailwind build outputs app/assets/builds/application.css via package.json script %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
@@ -30,6 +32,7 @@
         </div>
         <div class="flex items-center gap-4">
           <%= link_to "Tasks", tasks_path, class: "text-gray-600 hover:text-gray-900" %>
+          <%= link_to "Calendar", calendar_tasks_path, class: "text-gray-600 hover:text-gray-900" %>
         </div>
       </nav>
     </header>

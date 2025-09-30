@@ -1,7 +1,7 @@
 # app/controllers/tasks_controller.rb
 class TasksController < ApplicationController
   include ActionView::RecordIdentifier
-  before_action :set_task, only: [:show, :edit, :update, :destroy]
+  before_action :set_task, only: [:show, :edit, :update, :destroy, :modal]
 
   def index
     @tasks = Task.order(created_at: :desc)
@@ -74,10 +74,15 @@ class TasksController < ApplicationController
 
   def show
     if turbo_frame_request?
-      render partial: "tasks/task", locals: { task: @task }, layout: false
+      render partial: "tasks/show_modal", locals: { task: @task }, layout: false
     else
       # render full page if you have one
     end
+  end
+
+  # GET /tasks/:id/modal
+  def modal
+    render partial: "tasks/show_modal", locals: { task: @task }, layout: false
   end
 
   def destroy
@@ -85,6 +90,41 @@ class TasksController < ApplicationController
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.remove(dom_id(@task)) }
       format.html { redirect_to tasks_path, notice: "Task deleted.", status: :see_other }
+    end
+  end
+
+  # GET /tasks/calendar
+  def calendar
+    # Renders calendar view
+  end
+
+  # GET /tasks/events
+  def events
+    range_start = params[:start].presence && Time.zone.parse(params[:start]) rescue nil
+    range_end   = params[:end].presence && Time.zone.parse(params[:end]) rescue nil
+
+    scope = Task.all
+    if range_start && range_end
+      scope = scope.where(due_date: range_start..range_end)
+    elsif range_start
+      scope = scope.where('due_date >= ?', range_start)
+    elsif range_end
+      scope = scope.where('due_date <= ?', range_end)
+    end
+
+    events = scope.map do |t|
+      {
+        id: t.id,
+        title: t.title,
+        start: t.due_date&.iso8601,
+        allDay: true,
+        url: Rails.application.routes.url_helpers.modal_task_path(t)
+      }
+    end
+
+    respond_to do |format|
+      format.json { render json: events }
+      format.html { head :not_acceptable }
     end
   end
 
