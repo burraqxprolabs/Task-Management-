@@ -1,12 +1,49 @@
-<%= turbo_frame_tag dom_id(@task) do %>
-  <div class="task-details">
-    <h2><%= @task.title %></h2>
-    <p><strong>Description:</strong> <%= @task.description %></p>
-    <p><strong>Status:</strong> <%= @task.status %></p>
-    <p><strong>Due Date:</strong> <%= @task.due_date.strftime('%B %d, %Y') %></p>
-    <p><strong>Priority:</strong> <%= @task.priority %></p>
+<%=turbo_frame_tag dom_id(@task) do %>
+  <div class="card">
+    <h2 class="mb-2"><%= @task.title %></h2>
 
-    <%= link_to 'Edit', edit_task_path(@task, format: :turbo_stream), class: 'btn btn-primary' %> |
-    <%= link_to 'Back to Tasks', tasks_path, data: { turbo_frame: "tasks" }, class: 'btn btn-secondary' %>
+    <%# Badge classes (same logic as _task) %>
+    <% status_class = case @task.status
+       when 'done' then 'badge-success'
+       when 'doing' then 'badge-info'
+       else 'badge-neutral'
+     end %>
+    <% prio_val = @task.priority.to_i %>
+    <% prio_class = if prio_val >= 8
+        'badge-danger'
+      elsif prio_val >= 5
+        'badge-warning'
+      else
+        'badge-neutral'
+      end %>
+    <% due_class = 'badge-neutral' %>
+    <% if @task.due_date.present? %>
+      <% if @task.due_date < Time.current %>
+        <% due_class = 'badge-danger' %>
+      <% elsif @task.due_date.to_date == Date.current %>
+        <% due_class = 'badge-warning' %>
+      <% else %>
+        <% due_class = 'badge-neutral' %>
+      <% end %>
+    <% end %>
+
+    <div class="mb-4 flex flex-wrap items-center gap-2 text-xs">
+      <span class="badge <%= status_class %>"><span class="mr-1">Status:</span><span class="capitalize"><%= @task.status %></span></span>
+      <% if @task.due_date.present? %>
+        <span class="badge <%= due_class %>"><span class="mr-1">Due:</span><%= @task.due_date.strftime('%B %d, %Y') %></span>
+      <% end %>
+      <span class="badge <%= prio_class %>"><span class="mr-1">Priority:</span><%= @task.priority %></span>
+    </div>
+
+    <% if @task.description.present? %>
+      <div class="prose prose-sm max-w-none text-gray-800">
+        <p class="whitespace-pre-line"><%= @task.description %></p>
+      </div>
+    <% end %>
+
+    <div class="mt-5 flex gap-3">
+      <%= link_to 'Edit', edit_task_path(@task, format: :turbo_stream), class: 'btn' %>
+      <%= link_to 'Back to Tasks', tasks_path, data: {turbo_frame: "tasks" }, class: 'btn-secondary' %>
+    </div>
   </div>
 <% end %>

@@ -59,6 +59,7 @@ class TasksController < ApplicationController
           ]
         end
         format.html { redirect_to tasks_path, notice: "Task updated.", status: :see_other }
+        format.json { head :no_content }
       else
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
@@ -68,6 +69,7 @@ class TasksController < ApplicationController
           )
         end
         format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: { errors: @task.errors.full_messages }, status: :unprocessable_entity }
       end
     end
   end

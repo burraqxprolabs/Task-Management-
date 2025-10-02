@@ -23,6 +23,8 @@ export default class extends Controller {
       plugins: dayGridPlugin ? [dayGridPlugin] : [],
       initialView: 'dayGridMonth',
       height: 'auto',
+      editable: true,
+      eventDurationEditable: false,
       events: (info, success, failure) => {
         const url = new URL(this.eventsUrlValue, window.location.origin)
         url.searchParams.set('start', info.startStr)
@@ -31,6 +33,28 @@ export default class extends Controller {
           .then(r => r.json())
           .then(data => success(data))
           .catch(err => failure(err))
+      },
+      eventDrop: (info) => {
+        // Persist new date to server on drop
+        const id = info.event.id
+        const newDate = info.event.startStr // ISO date (allDay)
+        const tokenTag = document.querySelector('meta[name="csrf-token"]')
+        const csrfToken = tokenTag && tokenTag.getAttribute('content')
+
+        fetch(`/tasks/${id}.json`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-Token': csrfToken || ''
+          },
+          body: JSON.stringify({ task: { due_date: newDate } })
+        }).then(res => {
+          if (!res.ok) throw new Error('Failed to update')
+        }).catch(err => {
+          console.error(err)
+          info.revert()
+        })
       },
       eventClick: (info) => {
         info.jsEvent.preventDefault()

@@ -1,9 +1,12 @@
 <!-- app/views/tasks/_form_modal.html.erb -->
-<%= turbo_frame_tag "task_modal" do %>
+  <%= turbo_frame_tag "task_modal" do %>
   <div class="modal-backdrop">
     <div class="modal">
-      <h2 class="mb-2"><%= task.new_record? ? "New Task" : "Edit Task" %></h2>
+      <div class="mb-4 flex items-center justify-between border-b pb-3">
+        <h2 class="text-lg font-semibold"><%= task.new_record? ? "New Task" : "Edit Task" %></h2>
+        <button type="button" class="btn-secondary px-2 py-1" data-action="click->modal#close" aria-label="Close">✕</button>
+      </div>
       <%= render "tasks/form", task: task %>
     </div>
   </div>
-<% end %>
+  <% end %>

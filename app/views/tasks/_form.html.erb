@@ -1,42 +1,74 @@
 <!-- app/views/tasks/_form.html.erb -->
-<%= form_with(model: task, data: { turbo: true }, class: "space-y-3") do |f| %>
-  <% if task.errors.any? %>
-    <div class="border border-red-300 bg-red-50 p-2 rounded">
-      <ul class="list-disc ml-5">
-        <% task.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
+  <%= form_with(model: task, data: {turbo: true}, class: "space-y-6") do |f| %>
+    <% if task.errors.any? %>
+      <div class="rounded-md border border-red-200 bg-red-50 p-3">
+        <p class="font-medium text-red-700">Please fix the errors below.</p>
+        <ul class="mt-2 list-disc pl-5 text-sm text-red-700">
+          <% task.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :title do %>
+        Title <span class="text-red-600">*</span>
+      <% end %>
+      <% title_has_error = task.errors[:title].present? %>
+      <%= f.text_field :title, required: true, aria: { invalid: title_has_error, describedby: (title_has_error ? "title-error" : nil) } %>
+      <% if title_has_error %>
+        <p id="title-error" class="mt-1 text-sm text-red-600"><%= task.errors[:title].join(', ') %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-gray-500">A short, descriptive name for the task.</p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.label :description %>
+      <% desc_has_error = task.errors[:description].present? %>
+      <%= f.text_area :description, rows: 4, aria: { invalid: desc_has_error, describedby: (desc_has_error ? "description-error" : nil) } %>
+      <% if desc_has_error %>
+        <p id="description-error" class="mt-1 text-sm text-red-600"><%= task.errors[:description].join(', ') %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-gray-500">Optional details to provide context.</p>
+      <% end %>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div>
+        <%= f.label :status %>
+        <% status_has_error = task.errors[:status].present? %>
+        <%= f.select :status,
+                      [["Todo","todo"],["Doing","doing"],["Done","done"]],
+                      {},
+                      aria: { invalid: status_has_error, describedby: (status_has_error ? "status-error" : nil) } %>
+        <% if status_has_error %>
+          <p id="status-error" class="mt-1 text-sm text-red-600"><%= task.errors[:status].join(', ') %></p>
         <% end %>
-      </ul>
+      </div>
+      <div>
+        <%= f.label :priority %>
+        <% prio_has_error = task.errors[:priority].present? %>
+        <%= f.number_field :priority, aria: { invalid: prio_has_error, describedby: (prio_has_error ? "priority-error" : nil) }, class: "w-full" %>
+        <% if prio_has_error %>
+          <p id="priority-error" class="mt-1 text-sm text-red-600"><%= task.errors[:priority].join(', ') %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-gray-500">Higher number indicates higher priority.</p>
+        <% end %>
+      </div>
+      <div>
+        <%= f.label :due_date %>
+        <% due_has_error = task.errors[:due_date].present? %>
+        <%= f.datetime_local_field :due_date, aria: { invalid: due_has_error, describedby: (due_has_error ? "due_date-error" : nil) } %>
+        <% if due_has_error %>
+          <p id="due_date-error" class="mt-1 text-sm text-red-600"><%= task.errors[:due_date].join(', ') %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center justify-end gap-2">
+      <%= link_to "Cancel", "#", data: { action: "click->modal#close" }, class: "btn-secondary" %>
+      <%= f.submit(task.new_record? ? "Create Task" : "Save Changes", class: "btn") %>
     </div>
   <% end %>
-
-  <div>
-    <%= f.label :title %>
-    <%= f.text_field :title, required: true, class: "w-full" %>
-  </div>
-
-  <div>
-    <%= f.label :description %>
-    <%= f.text_area :description, rows: 3, class: "w-full" %>
-  </div>
-
-  <div class="flex gap-3">
-    <div>
-      <%= f.label :status %>
-      <%= f.select :status, [["Todo","todo"],["Doing","doing"],["Done","done"]], {}, class: "w-full" %>
-    </div>
-    <div>
-      <%= f.label :priority %>
-      <%= f.number_field :priority, class: "w-24" %>
-    </div>
-    <div>
-      <%= f.label :due_date %>
-      <%= f.datetime_local_field :due_date, class: "w-full" %>
-    </div>
-  </div>
-
-  <div class="mt-2 flex gap-2">
-    <%= f.submit class: "btn" %>
-    <%= link_to "Cancel", "#", data: { action: "click->modal#close" }, class: "btn-secondary" %>
-  </div>
-<% end %>
